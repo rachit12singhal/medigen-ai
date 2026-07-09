@@ -2,14 +2,17 @@ package com.medigen.backend.service.imple;
 
 import com.medigen.backend.dto.request.LoginRequest;
 import com.medigen.backend.dto.request.RegisterRequest;
+import com.medigen.backend.dto.response.AuthResponse;
 import com.medigen.backend.dto.response.UserResponse;
 import com.medigen.backend.entity.User;
 import com.medigen.backend.enums.Role;
 import com.medigen.backend.repository.UserRepository;
+import com.medigen.backend.security.JwtService;
 import com.medigen.backend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.medigen.backend.dto.response.AuthResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +20,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     @Override
     public UserResponse register(RegisterRequest request) {
@@ -43,16 +47,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String login(LoginRequest request) {
+    public AuthResponse login(LoginRequest request) {
 
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+                .orElseThrow(() ->
+                        new RuntimeException("Invalid email or password"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid email or password");
         }
 
-        // JWT token will be returned here in the next module
-        return "Login Successful";
+        return new AuthResponse(
+                jwtService.generateToken(user.getEmail())
+        );
     }
 }

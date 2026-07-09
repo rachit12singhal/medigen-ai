@@ -2,6 +2,7 @@ package com.medigen.backend.controller;
 
 import com.medigen.backend.dto.request.LoginRequest;
 import com.medigen.backend.dto.request.RegisterRequest;
+import com.medigen.backend.dto.response.AuthResponse;
 import com.medigen.backend.dto.response.UserResponse;
 import com.medigen.backend.service.UserService;
 import jakarta.validation.Valid;
@@ -24,8 +25,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(
-            @Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<AuthResponse> login(
+            @Valid @RequestBody LoginRequest request){
 
         return ResponseEntity.ok(userService.login(request));
     }
